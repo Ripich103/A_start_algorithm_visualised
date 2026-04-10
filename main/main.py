@@ -42,6 +42,8 @@ clock = pygame.time.Clock()
 mouse = pygame.mouse
 running = True
 clicked = False
+startExists = False
+endExists = False
 selected_type = Blocks.WALL
 
 GRID_SIZE_Y = 10
@@ -79,7 +81,22 @@ while running:
          x, y = mouse.get_pos()
          x, y = toIndexes(x, y)
          if x != -1 and y != -1:
-              type_array[y][x] = selected_type
+              flag = False
+              if(startExists and selected_type == Blocks.START or (endExists and selected_type == Blocks.END)):
+                   flag = True
+              elif (not startExists and selected_type == Blocks.START):
+                   startExists = True
+              elif (not endExists and selected_type == Blocks.END):
+                   endExists = True
+
+              if (type_array[y][x] == Blocks.START or type_array[y][x] == Blocks.END):
+                   if (selected_type != Blocks.START):
+                        startExists = False
+                   if (selected_type != Blocks.END):
+                        endExists = False
+              if (not flag):
+                   type_array[y][x] = selected_type
+              
 
     drawGrid(grid, screen)
 
