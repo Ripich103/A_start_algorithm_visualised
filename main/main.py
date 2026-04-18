@@ -77,6 +77,8 @@ def search_path(sx : int, sy : int, ex : int, ey : int, grid : list) -> list:
      closed = []
      open.append((sx, sy))
 
+     g_dict = {(sx, sy) : 0}
+
      came_from = {}
 
      while True:
@@ -86,7 +88,7 @@ def search_path(sx : int, sy : int, ex : int, ey : int, grid : list) -> list:
           for node in open:
                x, y = node
 
-               g = get_g((sx, sy), node)
+               g = g_dict.get(node, 2147483647)
                h = heruistics(node, (ex, ey))
                f = g + h
                if f < best_f :
@@ -113,9 +115,12 @@ def search_path(sx : int, sy : int, ex : int, ey : int, grid : list) -> list:
                          if grid[y][x][1] == Blocks.WALL or (x, y) in closed:
                               continue
                          else:
-                              if not node in open:
+                              tentative_g = g_dict[current] + get_g(node, current)
+                              if not node in open or tentative_g < g_dict.get(node, 2147483647):
+                                   g_dict[node] = tentative_g
                                    came_from[node] = current
-                                   open.append(node)
+                                   if node not in open:
+                                        open.append(node)
      return [(-1, -1)]  
 
 pygame.init()
@@ -158,7 +163,7 @@ while running:
                   selected_type = Blocks.END
              elif event.key == pygame.K_r:
                   if startExists and endExists:    
-
+                    print("run")
                     for i in range(0, len(grid)):
                          for j in range(0, len(grid[i])):
                               if grid[i][j][1] == Blocks.PATH:
@@ -167,7 +172,7 @@ while running:
                     startx, starty = getBlockPos(grid, Blocks.START)
                     endx, endy = getBlockPos(grid, Blocks.END)
                     lines = search_path(startx, starty, endx, endy, grid)
-                    
+                    print(lines)
                     if lines[0] != (-1, -1):
                          for x, y in lines:
                               if grid[y][x][1] != Blocks.START and grid[y][x][1] != Blocks.END:
